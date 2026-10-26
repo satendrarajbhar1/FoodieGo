@@ -51,7 +51,7 @@ const otpLimiter = rateLimit({
   message: limiterMessage,
 });
 
-app.get("/", (req, res) => res.send("Tomato API is running"));
+app.get("/", (req, res) => res.send("FoodieGo API is running"));
 
 app.use("/api/auth/verify-otp", otpLimiter);
 app.use("/api/auth", authLimiter, authRouter);

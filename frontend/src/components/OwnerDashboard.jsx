@@ -1,4 +1,3 @@
-
 import React from 'react'
 import Nav from './Nav'
 import { useSelector } from 'react-redux'
@@ -39,7 +38,7 @@ function OwnerDashboard() {
 
                 <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-white/90 sm:text-base">
                   Bring your delicious food online and connect with
-                  more customers through Tomato.
+                  more customers through FoodieGo.
                 </p>
               </div>
 

@@ -77,7 +77,7 @@ const CheckoutPage = () => {
       amount: razorpay.amount,
       currency: razorpay.currency,
       order_id: razorpay.orderId,
-      name: "Tomato",
+      name: "FoodieGo",
       description: `Order from ${cart.shopName}`,
       prefill: {
         name: userData?.fullName || "",

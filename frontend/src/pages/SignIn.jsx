@@ -87,7 +87,7 @@ const SignIn = () => {
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md">
 
         <h1 className="mb-6 text-center text-3xl font-bold text-red-500">
-          Tomato
+          FoodieGo
         </h1>
 
         <h2 className="mb-2 text-center text-2xl font-semibold text-gray-800">

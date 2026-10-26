@@ -94,7 +94,7 @@ const SignUp = () => {
       <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-md">
 
         <h1 className="mb-2 text-center text-2xl font-bold text-red-500">
-          Tomato
+          FoodieGo
         </h1>
 
         <h2 className="text-center text-xl font-semibold text-gray-800">

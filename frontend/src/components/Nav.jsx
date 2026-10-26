@@ -120,7 +120,7 @@ const Nav = () => {
           onClick={() => navigate('/')}
           className="cursor-pointer text-2xl font-bold text-red-500 sm:text-3xl"
         >
-          Tomato
+          FoodieGo
         </h1>
 
         {/* Location and Search (guest + user) */}
