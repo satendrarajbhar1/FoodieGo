@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setCurrentAddress,
   setCurrentCity,
@@ -10,12 +10,10 @@ import {
 
 function useGetCity() {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.user);
   const apiKey = import.meta.env.VITE_GEOAPIKEY;
 
+  // Guest ho ya logged-in, app khulte hi ek baar location detect karo
   useEffect(() => {
-    if (!userData) return;
-
     if (!navigator.geolocation) {
       console.log("Geolocation is not supported by this browser");
       return;
@@ -46,11 +44,12 @@ function useGetCity() {
         }
       },
       (error) => {
+       
         console.log("Location permission error:", error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
     );
-  }, [userData?._id]);
+  }, [dispatch, apiKey]);
 }
 
 export default useGetCity;

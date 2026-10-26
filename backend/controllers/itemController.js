@@ -119,38 +119,53 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// User ki city ke shops aur items me search suggestions
 export const searchSuggestions = async (req, res) => {
   try {
     const q = req.query.q?.trim();
     const city = req.query.city?.trim();
 
-    if (!q || !city) {
+    if (!q) {
       return res.status(200).json({ shops: [], items: [] });
     }
 
     const regex = new RegExp(escapeRegex(q), "i");
 
-    // Pehle us city ke saare shops nikalo
-    const cityShops = await Shop.find({
-      city: { $regex: `^${escapeRegex(city)}$`, $options: "i" },
-    }).select("_id");
+    const shopFilter = { name: regex };
+    const itemFilter = { $or: [{ name: regex }, { category: regex }] };
 
-    const shopIds = cityShops.map((shop) => shop._id);
+    if (city) {
+      const cityShops = await Shop.find({
+        city: { $regex: `^${escapeRegex(city)}$`, $options: "i" },
+      }).select("_id");
+
+      const shopIds = cityShops.map((shop) => shop._id);
+
+      shopFilter._id = { $in: shopIds };
+      itemFilter.shop = { $in: shopIds };
+    }
 
     const [shops, items] = await Promise.all([
-      Shop.find({ _id: { $in: shopIds }, name: regex })
-        .select("name image city")
-        .limit(5),
+      Shop.find(shopFilter).select("name image city").limit(5),
 
-      Item.find({
-        shop: { $in: shopIds },
-        $or: [{ name: regex }, { category: regex }],
-      })
+      Item.find(itemFilter)
         .select("name image price category shop")
         .populate("shop", "name")
         .limit(8),
     ]);
+
+    // Agar city me kuch nahi mila to poore platform me dhundo
+    if (city && shops.length === 0 && items.length === 0) {
+      const [allShops, allItems] = await Promise.all([
+        Shop.find({ name: regex }).select("name image city").limit(5),
+
+        Item.find({ $or: [{ name: regex }, { category: regex }] })
+          .select("name image price category shop")
+          .populate("shop", "name")
+          .limit(8),
+      ]);
+
+      return res.status(200).json({ shops: allShops, items: allItems });
+    }
 
     return res.status(200).json({ shops, items });
   } catch (error) {
@@ -160,3 +175,4 @@ export const searchSuggestions = async (req, res) => {
     });
   }
 };
+

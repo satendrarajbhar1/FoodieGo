@@ -7,7 +7,7 @@ import Nav from "./Nav";
 
 function UserDashboard() {
   const navigate = useNavigate();
-  const { currentCity, currentLocation, shopsInMyCity } = useSelector(
+  const { currentCity, shopsInMyCity, shopsFallback } = useSelector(
     (state) => state.user
   );
 
@@ -18,22 +18,24 @@ function UserDashboard() {
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            Inspiration for your first order
+            {shopsFallback
+              ? "Popular restaurants on Tomato"
+              : "Inspiration for your first order"}
           </h1>
 
           <p className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-            <FiMapPin className="text-red-500" />
-            {currentCity || currentLocation
-              ? "Restaurants near you"
-              : "Detecting your location..."}
+            <FiMapPin className="shrink-0 text-red-500" />
+            {shopsFallback
+              ? currentCity
+                ? `Abhi ${currentCity} me koi restaurant nahi hai, isliye saare restaurants dikha rahe hain.`
+                : "Saare registered restaurants"
+              : currentCity
+              ? `Restaurants near you in ${currentCity}`
+              : "Restaurants near you"}
           </p>
         </div>
 
-        {!currentCity && !currentLocation ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white px-5 py-12 text-center text-sm text-gray-500">
-            Please allow location access to see restaurants near you.
-          </div>
-        ) : shopsInMyCity.length === 0 ? (
+        {shopsInMyCity.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white px-5 py-14 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
               <FaUtensils className="text-3xl" />
@@ -42,7 +44,7 @@ function UserDashboard() {
               No restaurants found
             </h3>
             <p className="mt-2 text-sm text-gray-500">
-              Abhi aapke paas koi restaurant available nahi hai.
+              Abhi koi restaurant register nahi hai.
             </p>
           </div>
         ) : (
@@ -88,7 +90,9 @@ function UserDashboard() {
 
                   <p className="mt-3 text-xs font-semibold text-red-500">
                     {shop.items?.length || 0} food items
-                    {shop.distanceKm != null && ` • ${shop.distanceKm} km away`}
+                    {!shopsFallback &&
+                      shop.distanceKm != null &&
+                      ` • ${shop.distanceKm} km away`}
                   </p>
                 </div>
               </div>

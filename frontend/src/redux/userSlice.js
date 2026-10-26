@@ -4,16 +4,22 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     userData: null,
+    authLoading: true, 
     currentCity: null,
     currentState: null,
     currentAddress: null,
-    currentLocation: null, // { lat, lng }
+    currentLocation: null, 
     shopsInMyCity: [],
+    shopsFallback: false, 
   },
 
   reducers: {
     setUserData: (state, action) => {
       state.userData = action.payload;
+    },
+
+    setAuthLoading: (state, action) => {
+      state.authLoading = action.payload;
     },
 
     setCurrentCity: (state, action) => {
@@ -35,16 +41,22 @@ const userSlice = createSlice({
     setShopsInMyCity: (state, action) => {
       state.shopsInMyCity = action.payload;
     },
+
+    setShopsFallback: (state, action) => {
+      state.shopsFallback = action.payload;
+    },
   },
 });
 
 export const {
   setUserData,
+  setAuthLoading,
   setCurrentCity,
   setCurrentState,
   setCurrentAddress,
   setCurrentLocation,
   setShopsInMyCity,
+  setShopsFallback,
 } = userSlice.actions;
 
 export default userSlice.reducer;

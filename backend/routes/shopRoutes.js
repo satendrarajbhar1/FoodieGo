@@ -1,4 +1,3 @@
-
 import express from "express";
 import isAuth from "../middlewares/isAuth.js";
 import {
@@ -6,6 +5,7 @@ import {
   getMyShop,
   getNearbyShops,
   getShopById,
+  getAllShops,
 } from "../controllers/shopController.js";
 import { upload } from "../middlewares/multer.js";
 
@@ -26,10 +26,14 @@ const uploadImage = (req, res, next) => {
   });
 };
 
-shopRouter.get("/nearby", isAuth, getNearbyShops);
+// Public: guest bhi dekh sakta hai
+shopRouter.get("/nearby", getNearbyShops);
+shopRouter.get("/get-by-city", getNearbyShops);
+shopRouter.get("/get-all", getAllShops);
+shopRouter.get("/get-by-id/:shopId", getShopById);
+
+// Login zaroori
 shopRouter.get("/get-shop", isAuth, getMyShop);
 shopRouter.post("/create-edit", isAuth, uploadImage, createEditShop);
-shopRouter.get("/get-by-city", isAuth, getNearbyShops);  
-shopRouter.get("/get-by-id/:shopId", isAuth, getShopById);   
 
 export default shopRouter;

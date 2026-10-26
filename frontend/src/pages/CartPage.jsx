@@ -14,8 +14,19 @@ const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
+  const { userData } = useSelector((state) => state.user);
 
   const total = cart.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  // Guest ko pehle login karwao, login ke baad wapas checkout pe aayega
+  const handleCheckout = () => {
+    if (!userData) {
+      navigate("/signin", { state: { from: "/checkout" } });
+      return;
+    }
+
+    navigate("/checkout");
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-gray-50">
@@ -144,13 +155,12 @@ const CartPage = () => {
                 <span>₹{total}</span>
               </div>
 
-              {/* Phase 2 me ye checkout page par jayega */}
-                           <button
+              <button
                 type="button"
-                onClick={() => navigate("/checkout")}
+                onClick={handleCheckout}
                 className="mt-5 w-full rounded-xl bg-red-500 px-5 py-3.5 font-semibold text-white shadow-sm transition hover:bg-red-600"
               >
-                Proceed to Checkout
+                {userData ? "Proceed to Checkout" : "Sign in to Checkout"}
               </button>
             </div>
           </div>

@@ -224,7 +224,7 @@ export const getNearbyShops = async (req, res) => {
   }
 };
 
-// Ek shop ki details uske items ke saath
+
 export const getShopById = async (req, res) => {
   try {
     const { shopId } = req.params;
@@ -249,6 +249,25 @@ export const getShopById = async (req, res) => {
 
     return res.status(500).json({
       message: "Something went wrong while fetching the shop",
+    });
+  }
+};
+
+
+export const getAllShops = async (req, res) => {
+  try {
+    const shops = await Shop.find()
+      .populate("items")
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+
+    return res.status(200).json({ shops });
+  } catch (error) {
+    console.error("GET ALL SHOPS ERROR:", error);
+
+    return res.status(500).json({
+      message: "Unable to fetch restaurants.",
     });
   }
 };

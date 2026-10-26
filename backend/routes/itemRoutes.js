@@ -5,9 +5,10 @@ import { upload } from "../middlewares/multer.js";
 
 const itemRouter = express.Router();
 
-itemRouter.post("/add-item" , isAuth ,upload.single("image") , addItem)
-itemRouter.post("/edit-item/:itemId" , isAuth ,upload.single("image") , editItem)
-itemRouter.get("/search", isAuth, searchSuggestions); 
+itemRouter.post("/add-item", isAuth, upload.single("image"), addItem);
+itemRouter.post("/edit-item/:itemId", isAuth, upload.single("image"), editItem);
 
 
-export default itemRouter
+itemRouter.get("/search", searchSuggestions);
+
+export default itemRouter;

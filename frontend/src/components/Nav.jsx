@@ -17,6 +17,9 @@ const Nav = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  // Guest aur normal user dono customer hain
+  const isCustomer = !userData || userData.role === 'user'
+
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0)
 
   const [showProfile, setShowProfile] = useState(false)
@@ -32,7 +35,7 @@ const Nav = () => {
   useEffect(() => {
     const text = query.trim()
 
-    if (!text || !currentCity || userData?.role !== 'user') {
+    if (!text || !isCustomer) {
       setSuggestions({ shops: [], items: [] })
       setSearching(false)
       return
@@ -44,7 +47,8 @@ const Nav = () => {
     const timer = setTimeout(async () => {
       try {
         const result = await axios.get(`${serverUrl}/api/item/search`, {
-          params: { q: text, city: currentCity },
+          // city mili ho tabhi bhejo, warna sab jagah se search hoga
+          params: currentCity ? { q: text, city: currentCity } : { q: text },
           withCredentials: true,
         })
 
@@ -68,7 +72,7 @@ const Nav = () => {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [query, currentCity, userData?.role])
+  }, [query, currentCity, isCustomer])
 
   // Dropdown ke bahar click karne par band karo
   useEffect(() => {
@@ -101,7 +105,7 @@ const Nav = () => {
       dispatch(setMyShopData(null))
       dispatch(clearCart())
       setShowProfile(false)
-      navigate('/signin')
+      navigate('/')
     } catch (error) {
       console.log(error)
     }
@@ -119,14 +123,16 @@ const Nav = () => {
           Tomato
         </h1>
 
-        {/* Location and Search */}
-        {userData?.role === "user" && (
+        {/* Location and Search (guest + user) */}
+        {isCustomer && (
           <div className="order-3 flex w-full flex-col gap-3 sm:order-none sm:w-auto sm:flex-1 sm:flex-row sm:items-center sm:justify-center sm:px-4">
 
-            <div className="flex shrink-0 items-center gap-2 text-gray-700">
-              <FaLocationDot className="text-lg text-red-500" />
-              <span className="text-sm font-medium">{currentCity}</span>
-            </div>
+            {currentCity && (
+              <div className="flex shrink-0 items-center gap-2 text-gray-700">
+                <FaLocationDot className="text-lg text-red-500" />
+                <span className="text-sm font-medium">{currentCity}</span>
+              </div>
+            )}
 
             <div ref={searchRef} className="relative min-w-0 sm:max-w-sm sm:flex-1">
               <div className="flex min-w-0 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 focus-within:border-red-400">
@@ -230,7 +236,7 @@ const Nav = () => {
           </div>
         )}
 
-             {/* Owner Actions */}
+        {/* Owner Actions */}
         {userData?.role === "owner" && myShopData && (
           <>
             <button
@@ -255,8 +261,8 @@ const Nav = () => {
         {/* Actions */}
         <div className="flex shrink-0 items-center gap-3 sm:gap-5">
 
-          {/* Cart - Only for User */}
-          {userData?.role === "user" && (
+          {/* Cart: guest + user */}
+          {isCustomer && (
             <button
               type="button"
               onClick={() => navigate('/cart')}
@@ -267,9 +273,20 @@ const Nav = () => {
             </button>
           )}
 
-          {/* My Orders - Only for User */}
+          {/* Guest: Sign In button */}
+          {!userData && (
+            <button
+              type="button"
+              onClick={() => navigate('/signin')}
+              className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600 sm:px-5"
+            >
+              Sign In
+            </button>
+          )}
+
+          {/* My Orders: sirf logged-in user */}
           {userData?.role === "user" && (
-                       <button
+            <button
               type="button"
               onClick={() => navigate('/my-orders')}
               className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600 sm:px-5"
@@ -278,40 +295,42 @@ const Nav = () => {
             </button>
           )}
 
-          {/* Profile Dropdown */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowProfile(!showProfile)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-lg font-semibold uppercase text-red-600 transition hover:bg-red-200"
-            >
-              {userData?.fullName?.slice(0, 1) || ''}
-            </button>
+          {/* Profile Dropdown: sirf logged-in */}
+          {userData && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowProfile(!showProfile)}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-lg font-semibold uppercase text-red-600 transition hover:bg-red-200"
+              >
+                {userData.fullName?.slice(0, 1) || ''}
+              </button>
 
-            {showProfile && (
-              <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
+              {showProfile && (
+                <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
 
-                <div className="border-b border-gray-100 px-4 py-3">
-                  <p className="text-xs text-gray-500">
-                    Signed in as
-                  </p>
+                  <div className="border-b border-gray-100 px-4 py-3">
+                    <p className="text-xs text-gray-500">
+                      Signed in as
+                    </p>
 
-                  <p className="mt-1 truncate text-sm font-semibold text-gray-800">
-                    {userData?.fullName}
-                  </p>
+                    <p className="mt-1 truncate text-sm font-semibold text-gray-800">
+                      {userData.fullName}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 transition hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full px-4 py-3 text-left text-sm font-medium text-red-500 transition hover:bg-red-50"
-                >
-                  Logout
-                </button>
-
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
         </div>
       </div>
